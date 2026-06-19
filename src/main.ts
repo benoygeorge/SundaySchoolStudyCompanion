@@ -58,6 +58,7 @@ type AppState = {
   activeQuestionIndex: number
   sessionQuestions: StudyQuestion[]
   chapterSelectionInitialized: boolean
+  sessionStarted: boolean
   questionProgress: Record<string, { revealed: boolean; selfGrade: 'acceptable' | 'incorrect' | null }>
 }
 
@@ -72,6 +73,7 @@ const state: AppState = {
   activeQuestionIndex: 0,
   sessionQuestions: [],
   chapterSelectionInitialized: false,
+  sessionStarted: false,
   questionProgress: {}
 }
 
@@ -90,22 +92,14 @@ app.innerHTML = `
       <div class="hero-copy">
         <h1>Grade-aware study bank with built-in references.</h1>
         <p>
-          Load a grade JSON file, browse the question bank, and keep grade-specific
-          reference links in the same data file for a compact static deployment.
+          Choose your grade, practice questions by chapter, reveal answers, and
+          use the study links to review each lesson.
         </p>
       </div>
       <div class="hero-tools">
-        <label class="control-block">
-          <span>Grade</span>
+        <label class="control-block hero-grade-picker">
+          <span>Select Grade</span>
           <select id="grade-select"></select>
-        </label>
-        <label class="control-block control-block-wide">
-          <span>Search</span>
-          <input id="search-input" type="search" placeholder="Search questions, chapters, or answers" />
-        </label>
-        <label class="toggle-pill">
-          <input id="answers-toggle" type="checkbox" />
-          <span>Show answers</span>
         </label>
       </div>
     </header>
@@ -195,8 +189,6 @@ app.innerHTML = `
 `
 
 const gradeSelect = document.querySelector<HTMLSelectElement>('#grade-select')!
-const searchInput = document.querySelector<HTMLInputElement>('#search-input')!
-const answersToggle = document.querySelector<HTMLInputElement>('#answers-toggle')!
 const referencesList = document.querySelector<HTMLDivElement>('#references-list')!
 const referenceCount = document.querySelector<HTMLSpanElement>('#reference-count')!
 const questionCount = document.querySelector<HTMLSpanElement>('#question-count')!
@@ -362,7 +354,10 @@ function renderSetupPanel(): void {
         .map((input) => input.value)
       state.selectedChapters = ids
       renderSetupPanel()
-      renderQuestions()
+      if (state.sessionStarted) {
+        buildSessionQuestions()
+        renderQuestions()
+      }
     })
   })
 }
@@ -387,12 +382,12 @@ function buildSessionQuestions(): void {
   state.sessionQuestions = shuffled.slice(0, Math.min(state.quizSize, shuffled.length))
   state.activeQuestionIndex = 0
   state.questionProgress = Object.fromEntries(
-    state.sessionQuestions.map((question) => [question.id, { revealed: state.showAnswers, selfGrade: null }])
+    state.sessionQuestions.map((question) => [question.id, { revealed: false, selfGrade: null }])
   )
 }
 
 function getQuestionProgress(questionId: string): { revealed: boolean; selfGrade: 'acceptable' | 'incorrect' | null } {
-  return state.questionProgress[questionId] ?? { revealed: state.showAnswers, selfGrade: null }
+  return state.questionProgress[questionId] ?? { revealed: false, selfGrade: null }
 }
 
 function revealQuestion(questionId: string): void {
@@ -448,6 +443,13 @@ function renderReferences(): void {
 }
 
 function renderQuestions(): void {
+  if (!state.sessionStarted) {
+    filteredCount.textContent = '0 visible'
+    repeatMissedButton.disabled = true
+    questionGrid.innerHTML = '<p class="muted-copy">Select chapters and question count, then click Start Study Session to begin.</p>'
+    return
+  }
+
   const questions = state.sessionQuestions.length > 0 ? state.sessionQuestions : getFilteredQuestions()
   filteredCount.textContent = `${questions.length} visible`
 
@@ -465,13 +467,15 @@ function renderQuestions(): void {
       const progress = getQuestionProgress(question.id)
       const shouldShowAnswer = progress.revealed && Boolean(question.answer)
       const answerBlock = question.answer
-        ? `
-          <div class="answer-block ${shouldShowAnswer ? 'answer-open' : ''}">
-            <span class="answer-label">Answer</span>
-            <p>${escapeHtml(question.answer)}</p>
-            ${question.explanation ? `<p class="answer-note">${escapeHtml(question.explanation)}</p>` : ''}
-          </div>
-        `
+        ? (shouldShowAnswer
+            ? `
+              <div class="answer-block answer-open">
+                <span class="answer-label">Answer</span>
+                <p>${escapeHtml(question.answer)}</p>
+                ${question.explanation ? `<p class="answer-note">${escapeHtml(question.explanation)}</p>` : ''}
+              </div>
+            `
+            : '')
         : '<p class="muted-copy">No answer text was provided for this item.</p>'
 
       const statusChip = progress.selfGrade
@@ -518,7 +522,6 @@ function renderApp(): void {
   renderGradeStats()
   renderSetupPanel()
   renderReferences()
-  buildSessionQuestions()
   renderQuestions()
 }
 
@@ -557,6 +560,7 @@ async function loadGrade(entry: GradeIndexEntry): Promise<void> {
   state.quizSize = 10
   state.sessionQuestions = []
   state.chapterSelectionInitialized = false
+  state.sessionStarted = false
   renderApp()
 }
 
@@ -569,30 +573,15 @@ gradeSelect.addEventListener('change', async () => {
   await loadGrade(nextGrade)
 })
 
-searchInput.addEventListener('input', () => {
-  state.activeQuery = searchInput.value.trim()
-  buildSessionQuestions()
-  renderQuestions()
-})
-
-answersToggle.addEventListener('change', () => {
-  state.showAnswers = answersToggle.checked
-  if (state.showAnswers) {
-    state.sessionQuestions.forEach((question) => {
-      const current = getQuestionProgress(question.id)
-      state.questionProgress[question.id] = { ...current, revealed: true }
-    })
-  }
-  renderQuestions()
-})
-
 quizSizeInput.addEventListener('input', () => {
   const max = Number(quizSizeInput.max || '1')
   const value = Math.max(1, Math.min(max, Number(quizSizeInput.value) || 1))
   state.quizSize = value
   quizSizeInput.value = String(value)
-  buildSessionQuestions()
-  renderQuestions()
+  if (state.sessionStarted) {
+    buildSessionQuestions()
+    renderQuestions()
+  }
 })
 
 presetButtons.forEach((button) => {
@@ -601,8 +590,10 @@ presetButtons.forEach((button) => {
     const preset = button.dataset.preset
     state.quizSize = preset === 'all' ? max : Math.max(1, Math.min(max, Number(preset) || 1))
     quizSizeInput.value = String(state.quizSize)
-    buildSessionQuestions()
-    renderQuestions()
+    if (state.sessionStarted) {
+      buildSessionQuestions()
+      renderQuestions()
+    }
   })
 })
 
@@ -610,19 +601,24 @@ selectAllChaptersButton.addEventListener('click', () => {
   state.selectedChapters = getChapterChoices().map((chapter) => chapter.id)
   state.chapterSelectionInitialized = true
   renderSetupPanel()
-  buildSessionQuestions()
-  renderQuestions()
+  if (state.sessionStarted) {
+    buildSessionQuestions()
+    renderQuestions()
+  }
 })
 
 clearAllChaptersButton.addEventListener('click', () => {
   state.selectedChapters = []
   state.chapterSelectionInitialized = true
   renderSetupPanel()
-  buildSessionQuestions()
-  renderQuestions()
+  if (state.sessionStarted) {
+    buildSessionQuestions()
+    renderQuestions()
+  }
 })
 
 startSessionButton.addEventListener('click', () => {
+  state.sessionStarted = true
   buildSessionQuestions()
   renderQuestions()
   questionGrid.scrollIntoView({ behavior: 'smooth', block: 'start' })
