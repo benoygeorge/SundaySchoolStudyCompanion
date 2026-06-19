@@ -254,6 +254,10 @@ function getChapterChoices(): ChapterChoice[] {
   }))
 }
 
+function getChapterDisplayName(chapterId: string): string {
+  return getChapterChoices().find((chapter) => chapter.id === chapterId)?.title ?? chapterId
+}
+
 function getSelectedQuestionPool(): StudyQuestion[] {
   const grade = state.activeGrade
   if (!grade) {
@@ -275,6 +279,7 @@ function questionMatchesSearch(question: StudyQuestion, query: string): boolean 
 
   const haystack = [
     question.chapter,
+    getChapterDisplayName(question.chapter),
     question.section ?? '',
     question.question,
     (question.options ?? []).join(' '),
@@ -582,7 +587,7 @@ function renderQuestions(): void {
 
     <article class="question-card">
       <div class="question-card-top">
-        <span class="chip">${escapeHtml(question.chapter)}</span>
+        <span class="chip">${escapeHtml(getChapterDisplayName(question.chapter))}</span>
         <span class="chip chip-soft">${escapeHtml(formatType(question.type))}</span>
         <span class="chip chip-${escapeHtml(difficulty)}">${escapeHtml(difficulty)}</span>
         ${statusChip}
