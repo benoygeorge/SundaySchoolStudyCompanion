@@ -122,34 +122,32 @@ app.innerHTML = `
             <span id="available-count-label" class="muted-chip">0 questions available</span>
           </div>
 
-          <div class="setup-grid">
-            <div class="setup-card">
-              <label class="control-block">
-                <span>Questions to include</span>
-                <input id="quiz-size" type="number" min="1" value="10" />
-              </label>
+          <div class="setup-card setup-card-wide">
+            <label class="control-block">
+              <span>Questions to include</span>
+              <input id="quiz-size" type="number" min="1" value="10" />
+            </label>
 
-              <div class="preset-row">
-                <button type="button" class="preset-button" data-preset="10">10 Qs</button>
-                <button type="button" class="preset-button" data-preset="25">25 Qs</button>
-                <button type="button" class="preset-button" data-preset="50">50 Qs</button>
-                <button type="button" class="preset-button preset-button-primary" data-preset="all">All Questions</button>
+            <div class="preset-row">
+              <button type="button" class="preset-button" data-preset="10">10 Qs</button>
+              <button type="button" class="preset-button" data-preset="25">25 Qs</button>
+              <button type="button" class="preset-button" data-preset="50">50 Qs</button>
+              <button type="button" class="preset-button preset-button-primary" data-preset="all">All Questions</button>
+            </div>
+          </div>
+
+          <div class="setup-card setup-card-wide">
+            <div class="setup-header">
+              <div>
+                <h3>Select chapters to include</h3>
+                <p>Pick the chapters you want in the session, then start with the subset you want to study.</p>
+              </div>
+              <div class="setup-actions">
+                <button type="button" class="link-button" id="select-all-chapters">Select All Chapters</button>
+                <button type="button" class="link-button link-button-muted" id="clear-all-chapters">Clear All</button>
               </div>
             </div>
-
-            <div class="setup-card setup-card-wide">
-              <div class="setup-header">
-                <div>
-                  <h3>Select chapters to include</h3>
-                  <p>Pick the chapters you want in the session, then start with the subset you want to study.</p>
-                </div>
-                <div class="setup-actions">
-                  <button type="button" class="link-button" id="select-all-chapters">Select All Chapters</button>
-                  <button type="button" class="link-button link-button-muted" id="clear-all-chapters">Clear All</button>
-                </div>
-              </div>
-              <div id="chapters-grid" class="chapters-grid"></div>
-            </div>
+            <div id="chapters-grid" class="chapters-grid"></div>
           </div>
 
           <div class="setup-footer">
@@ -324,9 +322,9 @@ function renderSetupPanel(): void {
             return `
               <label class="chapter-choice">
                 <input type="checkbox" value="${escapeHtml(chapter.id)}" ${checked} />
-                <span>
+                <span class="chapter-choice-text">
                   <strong>${escapeHtml(chapter.id)}</strong>
-                  <small>${escapeHtml(chapter.title)}</small>
+                  <span>${escapeHtml(chapter.title)}</span>
                 </span>
               </label>
             `

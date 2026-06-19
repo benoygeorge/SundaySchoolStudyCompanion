@@ -243,12 +243,6 @@ a {
   gap: 18px;
 }
 
-.setup-grid {
-  display: grid;
-  grid-template-columns: minmax(280px, 320px) minmax(0, 1fr);
-  gap: 16px;
-}
-
 .setup-card {
   padding: 16px;
   border-radius: 20px;
@@ -347,18 +341,18 @@ a {
 
 .chapters-grid {
   display: grid;
-  gap: 12px;
+  gap: 8px;
 }
 
 .chapter-group {
-  padding: 14px;
+  padding: 10px;
   border-radius: 18px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: rgba(255, 255, 255, 0.66);
 }
 
 .chapter-group h4 {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   color: var(--accent-strong);
   font-size: 0.82rem;
   letter-spacing: 0.08em;
@@ -367,33 +361,42 @@ a {
 
 .chapter-choice-list {
   display: grid;
-  gap: 10px;
+  gap: 6px;
 }
 
 .chapter-choice {
   display: flex;
-  gap: 10px;
-  align-items: start;
-  padding: 10px 12px;
-  border-radius: 14px;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 10px;
+  border-radius: 12px;
   background: rgba(255, 255, 255, 0.88);
   border: 1px solid rgba(15, 23, 42, 0.06);
 }
 
 .chapter-choice input {
-  margin-top: 4px;
+  margin-top: 0;
   accent-color: var(--accent);
 }
 
+.chapter-choice-text {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 8px;
+  min-width: 0;
+}
+
 .chapter-choice strong {
-  display: block;
+  display: inline;
   color: var(--title);
 }
 
-.chapter-choice small {
-  display: block;
+.chapter-choice-text span {
+  display: inline;
   color: var(--muted);
-  margin-top: 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .panel-accent {
@@ -674,10 +677,6 @@ a {
   }
 
   .hero-tools {
-    grid-template-columns: 1fr;
-  }
-
-  .setup-grid {
     grid-template-columns: 1fr;
   }
 }
