@@ -7,5 +7,6 @@
 - Prefer small, local edits and keep the UI responsive on mobile and desktop.
 - When adding a new grade, update both the grade JSON file and the grade index.
 - Azure deployment for this repo uses a dedicated resource group: `rg-sundayschool-studycompanion-central` (Central US).
+- Prefer `npm run deploy:azure` for all routine publishes instead of ad-hoc Azure CLI deploy commands.
 - Use `npm run deploy:azure` for routine publishes of UI/content changes.
 - Deployment helper script is `scripts/deploy-azure-static-webapp.sh` and can optionally update Route 53 plus request custom domain attach.
