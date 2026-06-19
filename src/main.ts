@@ -41,12 +41,24 @@ type GradeData = {
   references?: StudyReference[]
 }
 
+type ChapterChoice = {
+  id: string
+  title: string
+  group: string
+}
+
 type AppState = {
   gradeIndex: GradeIndexEntry[]
   activeGradeId: string
   activeGrade: GradeData | null
   activeQuery: string
   showAnswers: boolean
+  selectedChapters: string[]
+  quizSize: number
+  activeQuestionIndex: number
+  sessionQuestions: StudyQuestion[]
+  chapterSelectionInitialized: boolean
+  questionProgress: Record<string, { revealed: boolean; selfGrade: 'acceptable' | 'incorrect' | null }>
 }
 
 const state: AppState = {
@@ -54,7 +66,13 @@ const state: AppState = {
   activeGradeId: '',
   activeGrade: null,
   activeQuery: '',
-  showAnswers: false
+  showAnswers: false,
+  selectedChapters: [],
+  quizSize: 10,
+  activeQuestionIndex: 0,
+  sessionQuestions: [],
+  chapterSelectionInitialized: false,
+  questionProgress: {}
 }
 
 const app = document.querySelector<HTMLDivElement>('#app')
@@ -94,14 +112,6 @@ app.innerHTML = `
 
     <main class="layout-grid">
       <aside class="sidebar-stack">
-        <section class="panel panel-accent">
-          <div class="panel-heading">
-            <h2>Current grade</h2>
-            <span id="grade-file-label" class="muted-chip">Loading</span>
-          </div>
-          <div id="grade-summary" class="grade-summary"></div>
-        </section>
-
         <section class="panel">
           <div class="panel-heading">
             <h2>References</h2>
@@ -109,16 +119,51 @@ app.innerHTML = `
           </div>
           <div id="references-list" class="reference-list"></div>
         </section>
-
-        <section class="panel">
-          <div class="panel-heading">
-            <h2>Chapters</h2>
-          </div>
-          <div id="chapter-pills" class="pill-cloud"></div>
-        </section>
       </aside>
 
       <section class="content-stack">
+        <section class="panel setup-panel">
+          <div class="panel-heading">
+            <h2>Study session setup</h2>
+            <span id="available-count-label" class="muted-chip">0 questions available</span>
+          </div>
+
+          <div class="setup-grid">
+            <div class="setup-card">
+              <label class="control-block">
+                <span>Questions to include</span>
+                <input id="quiz-size" type="number" min="1" value="10" />
+              </label>
+
+              <div class="preset-row">
+                <button type="button" class="preset-button" data-preset="10">10 Qs</button>
+                <button type="button" class="preset-button" data-preset="25">25 Qs</button>
+                <button type="button" class="preset-button" data-preset="50">50 Qs</button>
+                <button type="button" class="preset-button preset-button-primary" data-preset="all">All Questions</button>
+              </div>
+            </div>
+
+            <div class="setup-card setup-card-wide">
+              <div class="setup-header">
+                <div>
+                  <h3>Select chapters to include</h3>
+                  <p>Pick the chapters you want in the session, then start with the subset you want to study.</p>
+                </div>
+                <div class="setup-actions">
+                  <button type="button" class="link-button" id="select-all-chapters">Select All Chapters</button>
+                  <button type="button" class="link-button link-button-muted" id="clear-all-chapters">Clear All</button>
+                </div>
+              </div>
+              <div id="chapters-grid" class="chapters-grid"></div>
+            </div>
+          </div>
+
+          <div class="setup-footer">
+            <button type="button" id="start-session-btn" class="start-session-button">Start Study Session</button>
+            <span id="session-hint" class="muted-copy">Session will use the selected chapters and the requested question count.</span>
+          </div>
+        </section>
+
         <section class="stats-row">
           <article class="stat-card">
             <span class="stat-label">Questions</span>
@@ -137,7 +182,10 @@ app.innerHTML = `
         <section class="panel featured-panel">
           <div class="panel-heading">
             <h2>Question bank</h2>
-            <span id="filtered-count" class="muted-chip">0 visible</span>
+            <div class="panel-heading-actions">
+              <button type="button" id="repeat-missed-btn" class="link-button link-button-muted" disabled>Repeat Missed / Incorrect</button>
+              <span id="filtered-count" class="muted-chip">0 visible</span>
+            </div>
           </div>
           <div id="question-grid" class="question-grid"></div>
         </section>
@@ -149,16 +197,22 @@ app.innerHTML = `
 const gradeSelect = document.querySelector<HTMLSelectElement>('#grade-select')!
 const searchInput = document.querySelector<HTMLInputElement>('#search-input')!
 const answersToggle = document.querySelector<HTMLInputElement>('#answers-toggle')!
-const gradeFileLabel = document.querySelector<HTMLSpanElement>('#grade-file-label')!
-const gradeSummary = document.querySelector<HTMLDivElement>('#grade-summary')!
 const referencesList = document.querySelector<HTMLDivElement>('#references-list')!
 const referenceCount = document.querySelector<HTMLSpanElement>('#reference-count')!
-const chapterPills = document.querySelector<HTMLDivElement>('#chapter-pills')!
 const questionCount = document.querySelector<HTMLSpanElement>('#question-count')!
 const chapterCount = document.querySelector<HTMLSpanElement>('#chapter-count')!
 const answerCount = document.querySelector<HTMLSpanElement>('#answer-count')!
 const filteredCount = document.querySelector<HTMLSpanElement>('#filtered-count')!
 const questionGrid = document.querySelector<HTMLDivElement>('#question-grid')!
+const repeatMissedButton = document.querySelector<HTMLButtonElement>('#repeat-missed-btn')!
+const quizSizeInput = document.querySelector<HTMLInputElement>('#quiz-size')!
+const availableCountLabel = document.querySelector<HTMLSpanElement>('#available-count-label')!
+const chaptersGrid = document.querySelector<HTMLDivElement>('#chapters-grid')!
+const startSessionButton = document.querySelector<HTMLButtonElement>('#start-session-btn')!
+const selectAllChaptersButton = document.querySelector<HTMLButtonElement>('#select-all-chapters')!
+const clearAllChaptersButton = document.querySelector<HTMLButtonElement>('#clear-all-chapters')!
+
+const presetButtons = Array.from(document.querySelectorAll<HTMLButtonElement>('[data-preset]'))
 
 const defaultGradeId = 'grade-10'
 
@@ -183,8 +237,37 @@ function formatDifficulty(difficulty?: string | null): string {
   return difficulty.toLowerCase()
 }
 
-function activeGradeLabel(): string {
-  return state.gradeIndex.find((entry) => entry.id === state.activeGradeId)?.label ?? state.activeGradeId
+function getChapterChoices(): ChapterChoice[] {
+  const chapters = state.activeGrade?.chapters ?? []
+
+  if (chapters.length > 0) {
+    return chapters.map((chapter) => ({
+      id: chapter.id,
+      title: chapter.title,
+      group: chapter.group ?? 'Study Chapters'
+    }))
+  }
+
+  const chapterNames = Array.from(new Set((state.activeGrade?.questions ?? []).map((question) => question.chapter)))
+  return chapterNames.map((chapter) => ({
+    id: chapter,
+    title: chapter,
+    group: 'Study Chapters'
+  }))
+}
+
+function getSelectedQuestionPool(): StudyQuestion[] {
+  const grade = state.activeGrade
+  if (!grade) {
+    return []
+  }
+
+  if (state.selectedChapters.length === 0 && state.chapterSelectionInitialized) {
+    return []
+  }
+
+  const chapterFilter = state.selectedChapters.length > 0 ? state.selectedChapters : getChapterChoices().map((chapter) => chapter.id)
+  return grade.questions.filter((question) => chapterFilter.includes(question.chapter))
 }
 
 function questionMatchesSearch(question: StudyQuestion, query: string): boolean {
@@ -207,50 +290,136 @@ function questionMatchesSearch(question: StudyQuestion, query: string): boolean 
 }
 
 function getFilteredQuestions(): StudyQuestion[] {
-  const grade = state.activeGrade
-  if (!grade) {
+  const selectedPool = getSelectedQuestionPool()
+  if (selectedPool.length === 0) {
     return []
   }
 
-  return grade.questions.filter((question) => questionMatchesSearch(question, state.activeQuery))
+  return selectedPool
+    .filter((question) => questionMatchesSearch(question, state.activeQuery))
+    .slice(0, state.quizSize)
 }
 
-function renderGradeSummary(): void {
+function syncChapterSelection(chapters: ChapterChoice[]): void {
+  if (!state.chapterSelectionInitialized && state.selectedChapters.length === 0) {
+    state.selectedChapters = chapters.map((chapter) => chapter.id)
+  } else {
+    state.selectedChapters = state.selectedChapters.filter((chapterId) => chapters.some((chapter) => chapter.id === chapterId))
+  }
+}
+
+function renderSetupPanel(): void {
+  const chapters = getChapterChoices()
+  syncChapterSelection(chapters)
+
+  chaptersGrid.innerHTML = ''
+  const grouped = new Map<string, ChapterChoice[]>()
+  chapters.forEach((chapter) => {
+    const list = grouped.get(chapter.group) ?? []
+    list.push(chapter)
+    grouped.set(chapter.group, list)
+  })
+
+  grouped.forEach((list, group) => {
+    const groupPanel = document.createElement('section')
+    groupPanel.className = 'chapter-group'
+    groupPanel.innerHTML = `
+      <h4>${escapeHtml(group)}</h4>
+      <div class="chapter-choice-list">
+        ${list
+          .map((chapter) => {
+            const checked = state.selectedChapters.includes(chapter.id) ? 'checked' : ''
+            return `
+              <label class="chapter-choice">
+                <input type="checkbox" value="${escapeHtml(chapter.id)}" ${checked} />
+                <span>
+                  <strong>${escapeHtml(chapter.id)}</strong>
+                  <small>${escapeHtml(chapter.title)}</small>
+                </span>
+              </label>
+            `
+          })
+          .join('')}
+      </div>
+    `
+    chaptersGrid.appendChild(groupPanel)
+  })
+
+  const selectedPool = getSelectedQuestionPool()
+  availableCountLabel.textContent = `${selectedPool.length} questions available`
+
+  const maxAllowed = Math.max(1, selectedPool.length)
+  quizSizeInput.max = String(maxAllowed)
+  if (state.quizSize > maxAllowed) {
+    state.quizSize = maxAllowed
+  }
+  quizSizeInput.value = String(state.quizSize)
+
+  chaptersGrid.querySelectorAll<HTMLInputElement>('input[type="checkbox"]').forEach((checkbox) => {
+    checkbox.addEventListener('change', () => {
+      const ids = Array.from(chaptersGrid.querySelectorAll<HTMLInputElement>('input[type="checkbox"]'))
+        .filter((input) => input.checked)
+        .map((input) => input.value)
+      state.selectedChapters = ids
+      renderSetupPanel()
+      renderQuestions()
+    })
+  })
+}
+
+function renderGradeStats(): void {
   if (!state.activeGrade) {
-    gradeSummary.innerHTML = '<p class="muted-copy">No grade loaded.</p>'
-    gradeFileLabel.textContent = 'Unavailable'
+    questionCount.textContent = '0'
+    chapterCount.textContent = '0'
+    answerCount.textContent = '0'
     return
   }
 
   const grade = state.activeGrade
-  const chapters = new Map<string, string>()
-  grade.questions.forEach((question) => {
-    if (!chapters.has(question.chapter)) {
-      chapters.set(question.chapter, question.chapter)
-    }
-  })
-
-  gradeSummary.innerHTML = `
-    <div class="summary-block">
-      <div>
-        <span class="summary-label">Grade</span>
-        <strong>${escapeHtml(grade.grade)}</strong>
-      </div>
-      <div>
-        <span class="summary-label">Title</span>
-        <strong>${escapeHtml(grade.title ?? activeGradeLabel())}</strong>
-      </div>
-      <div>
-        <span class="summary-label">Description</span>
-        <p>${escapeHtml(grade.description ?? 'Study data and references live in the same JSON file for this grade.')}</p>
-      </div>
-    </div>
-  `
-
-  gradeFileLabel.textContent = `${state.activeGradeId}.json`
   questionCount.textContent = `${grade.questions.length}`
-  chapterCount.textContent = `${chapters.size}`
+  chapterCount.textContent = `${getChapterChoices().length}`
   answerCount.textContent = `${grade.questions.filter((question) => Boolean(question.answer)).length}`
+}
+
+function buildSessionQuestions(): void {
+  const pool = getFilteredQuestions()
+  const shuffled = [...pool].sort(() => Math.random() - 0.5)
+  state.sessionQuestions = shuffled.slice(0, Math.min(state.quizSize, shuffled.length))
+  state.activeQuestionIndex = 0
+  state.questionProgress = Object.fromEntries(
+    state.sessionQuestions.map((question) => [question.id, { revealed: state.showAnswers, selfGrade: null }])
+  )
+}
+
+function getQuestionProgress(questionId: string): { revealed: boolean; selfGrade: 'acceptable' | 'incorrect' | null } {
+  return state.questionProgress[questionId] ?? { revealed: state.showAnswers, selfGrade: null }
+}
+
+function revealQuestion(questionId: string): void {
+  const current = getQuestionProgress(questionId)
+  state.questionProgress[questionId] = { ...current, revealed: true }
+  renderQuestions()
+}
+
+function gradeQuestion(questionId: string, selfGrade: 'acceptable' | 'incorrect'): void {
+  const current = getQuestionProgress(questionId)
+  state.questionProgress[questionId] = { ...current, revealed: true, selfGrade }
+  renderQuestions()
+}
+
+function repeatMissedQuestions(): void {
+  const missed = state.sessionQuestions.filter((question) => getQuestionProgress(question.id).selfGrade === 'incorrect')
+
+  if (missed.length === 0) {
+    return
+  }
+
+  state.sessionQuestions = missed
+  state.quizSize = missed.length
+  state.questionProgress = Object.fromEntries(missed.map((question) => [question.id, { revealed: false, selfGrade: null }]))
+  quizSizeInput.value = String(missed.length)
+  quizSizeInput.max = String(Math.max(1, missed.length))
+  renderQuestions()
 }
 
 function renderReferences(): void {
@@ -278,16 +447,12 @@ function renderReferences(): void {
     .join('')
 }
 
-function renderChapters(): void {
-  const chapters = Array.from(new Set((state.activeGrade?.questions ?? []).map((question) => question.chapter)))
-  chapterPills.innerHTML = chapters
-    .map((chapter) => `<span class="chapter-pill">${escapeHtml(chapter)}</span>`)
-    .join('')
-}
-
 function renderQuestions(): void {
-  const questions = getFilteredQuestions()
+  const questions = state.sessionQuestions.length > 0 ? state.sessionQuestions : getFilteredQuestions()
   filteredCount.textContent = `${questions.length} visible`
+
+  const missedCount = questions.filter((question) => getQuestionProgress(question.id).selfGrade === 'incorrect').length
+  repeatMissedButton.disabled = missedCount === 0
 
   if (questions.length === 0) {
     questionGrid.innerHTML = '<p class="muted-copy">No questions matched the current search.</p>'
@@ -297,7 +462,8 @@ function renderQuestions(): void {
   questionGrid.innerHTML = questions
     .map((question, index) => {
       const difficulty = formatDifficulty(question.difficulty)
-      const shouldShowAnswer = state.showAnswers && Boolean(question.answer)
+      const progress = getQuestionProgress(question.id)
+      const shouldShowAnswer = progress.revealed && Boolean(question.answer)
       const answerBlock = question.answer
         ? `
           <div class="answer-block ${shouldShowAnswer ? 'answer-open' : ''}">
@@ -308,12 +474,30 @@ function renderQuestions(): void {
         `
         : '<p class="muted-copy">No answer text was provided for this item.</p>'
 
+      const statusChip = progress.selfGrade
+        ? `<span class="chip ${progress.selfGrade === 'acceptable' ? 'chip-easy' : 'chip-hard'}">${escapeHtml(progress.selfGrade)}</span>`
+        : ''
+
+      const revealButton = question.answer && !progress.revealed
+        ? `<button type="button" class="card-action-button" data-action="reveal" data-question-id="${escapeHtml(question.id)}">Reveal Answer</button>`
+        : ''
+
+      const selfAssessButtons = progress.revealed && question.answer
+        ? `
+          <div class="self-assess-row">
+            <button type="button" class="card-action-button card-action-button-good" data-action="acceptable" data-question-id="${escapeHtml(question.id)}">Acceptable</button>
+            <button type="button" class="card-action-button card-action-button-bad" data-action="incorrect" data-question-id="${escapeHtml(question.id)}">Missed</button>
+          </div>
+        `
+        : ''
+
       return `
         <article class="question-card">
           <div class="question-card-top">
             <span class="chip">${escapeHtml(question.chapter)}</span>
             <span class="chip chip-soft">${escapeHtml(formatType(question.type))}</span>
             <span class="chip chip-${escapeHtml(difficulty)}">${escapeHtml(difficulty)}</span>
+            ${statusChip}
           </div>
           <h3>${index + 1}. ${escapeHtml(question.question)}</h3>
           <div class="question-meta">
@@ -321,7 +505,9 @@ function renderQuestions(): void {
             ${question.page ? `<span>Page ${escapeHtml(String(question.page))}</span>` : ''}
             ${question.source_excerpt ? `<span>${escapeHtml(question.source_excerpt)}</span>` : ''}
           </div>
+          ${revealButton}
           ${answerBlock}
+          ${selfAssessButtons}
         </article>
       `
     })
@@ -329,9 +515,10 @@ function renderQuestions(): void {
 }
 
 function renderApp(): void {
-  renderGradeSummary()
+  renderGradeStats()
+  renderSetupPanel()
   renderReferences()
-  renderChapters()
+  buildSessionQuestions()
   renderQuestions()
 }
 
@@ -366,6 +553,10 @@ async function loadGrade(entry: GradeIndexEntry): Promise<void> {
 
   state.activeGrade = (await response.json()) as GradeData
   state.activeGradeId = entry.id
+  state.selectedChapters = []
+  state.quizSize = 10
+  state.sessionQuestions = []
+  state.chapterSelectionInitialized = false
   renderApp()
 }
 
@@ -380,12 +571,88 @@ gradeSelect.addEventListener('change', async () => {
 
 searchInput.addEventListener('input', () => {
   state.activeQuery = searchInput.value.trim()
+  buildSessionQuestions()
   renderQuestions()
 })
 
 answersToggle.addEventListener('change', () => {
   state.showAnswers = answersToggle.checked
+  if (state.showAnswers) {
+    state.sessionQuestions.forEach((question) => {
+      const current = getQuestionProgress(question.id)
+      state.questionProgress[question.id] = { ...current, revealed: true }
+    })
+  }
   renderQuestions()
+})
+
+quizSizeInput.addEventListener('input', () => {
+  const max = Number(quizSizeInput.max || '1')
+  const value = Math.max(1, Math.min(max, Number(quizSizeInput.value) || 1))
+  state.quizSize = value
+  quizSizeInput.value = String(value)
+  buildSessionQuestions()
+  renderQuestions()
+})
+
+presetButtons.forEach((button) => {
+  button.addEventListener('click', () => {
+    const max = Number(quizSizeInput.max || '1')
+    const preset = button.dataset.preset
+    state.quizSize = preset === 'all' ? max : Math.max(1, Math.min(max, Number(preset) || 1))
+    quizSizeInput.value = String(state.quizSize)
+    buildSessionQuestions()
+    renderQuestions()
+  })
+})
+
+selectAllChaptersButton.addEventListener('click', () => {
+  state.selectedChapters = getChapterChoices().map((chapter) => chapter.id)
+  state.chapterSelectionInitialized = true
+  renderSetupPanel()
+  buildSessionQuestions()
+  renderQuestions()
+})
+
+clearAllChaptersButton.addEventListener('click', () => {
+  state.selectedChapters = []
+  state.chapterSelectionInitialized = true
+  renderSetupPanel()
+  buildSessionQuestions()
+  renderQuestions()
+})
+
+startSessionButton.addEventListener('click', () => {
+  buildSessionQuestions()
+  renderQuestions()
+  questionGrid.scrollIntoView({ behavior: 'smooth', block: 'start' })
+})
+
+repeatMissedButton.addEventListener('click', () => {
+  repeatMissedQuestions()
+})
+
+questionGrid.addEventListener('click', (event) => {
+  const target = event.target as HTMLElement | null
+  const action = target?.closest<HTMLButtonElement>('[data-action]')
+
+  if (!action) {
+    return
+  }
+
+  const questionId = action.dataset.questionId
+  const verb = action.dataset.action as 'reveal' | 'acceptable' | 'incorrect' | undefined
+  if (!questionId || !verb) {
+    return
+  }
+
+  if (verb === 'reveal') {
+    revealQuestion(questionId)
+  } else if (verb === 'acceptable') {
+    gradeQuestion(questionId, 'acceptable')
+  } else if (verb === 'incorrect') {
+    gradeQuestion(questionId, 'incorrect')
+  }
 })
 
 loadGradeIndex().catch((error: unknown) => {

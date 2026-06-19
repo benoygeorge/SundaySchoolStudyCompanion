@@ -39,6 +39,16 @@ If you want a specific file from the repository, use one of these approaches:
 
 3. Open the local URL shown by Vite in your browser.
 
+## Study session flow
+
+After the app loads a grade, use the setup panel to:
+
+1. Pick how many questions to include.
+2. Select or clear the chapters you want in the session.
+3. Click `Start Study Session` to refresh the visible question bank.
+
+This mirrors the original grade 10 study companion flow while keeping the app static-host friendly.
+
 ## Build for static hosting
 
 Run the production build with:

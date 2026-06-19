@@ -4,9 +4,99 @@
   "description": "Question bank and reference links live together in one grade file so the static app can load everything with one fetch.",
   "chapters": [
     {
+      "id": "1",
+      "title": "Development of Holy Scripture",
+      "group": "Holy Bible"
+    },
+    {
+      "id": "2",
+      "title": "Old Testament 1: Law and History",
+      "group": "Holy Bible"
+    },
+    {
+      "id": "3",
+      "title": "Old Testament 2: Wisdom and Prophecy",
+      "group": "Holy Bible"
+    },
+    {
+      "id": "4",
+      "title": "Moses - God's Chosen Leader",
+      "group": "Holy Bible"
+    },
+    {
+      "id": "5",
+      "title": "New Testament 1: A New Covenant",
+      "group": "Holy Bible"
+    },
+    {
+      "id": "6",
+      "title": "New Testament 2: Epistles of St. Paul",
+      "group": "Holy Bible"
+    },
+    {
+      "id": "7",
+      "title": "St. Mary - The Handmaid of God",
+      "group": "Holy Bible"
+    },
+    {
+      "id": "8",
+      "title": "Apostolic Traditions",
+      "group": "Holy Church and Tradition"
+    },
+    {
+      "id": "9",
+      "title": "Holy Priesthood",
+      "group": "Holy Church and Tradition"
+    },
+    {
+      "id": "10",
+      "title": "Holy Matrimony",
+      "group": "Holy Church and Tradition"
+    },
+    {
+      "id": "11",
+      "title": "Salvation",
+      "group": "Holy Church and Tradition"
+    },
+    {
+      "id": "12",
+      "title": "Eschatology: An Orthodox Perspective",
+      "group": "Holy Church and Tradition"
+    },
+    {
+      "id": "13",
+      "title": "Christian Monasticism",
+      "group": "Holy Church and Tradition"
+    },
+    {
+      "id": "14",
+      "title": "History of the Syriac Orthodox Church",
+      "group": "Holy Church and Tradition"
+    },
+    {
+      "id": "15",
+      "title": "Foundations of Orthodox Spirituality",
+      "group": "Holy Church and Tradition"
+    },
+    {
+      "id": "16",
+      "title": "Spirituality in Practice",
+      "group": "Faith in Practice"
+    },
+    {
+      "id": "17",
+      "title": "Fighting Temptations",
+      "group": "Faith in Practice"
+    },
+    {
+      "id": "18",
+      "title": "Christian Financial Stewardship",
+      "group": "Faith in Practice"
+    },
+    {
       "id": "Holy Qurbana",
       "title": "Holy Qurbana",
-      "group": "Holy Church and Tradition"
+      "group": "Holy Qurbana"
     }
   ],
   "questions": [
