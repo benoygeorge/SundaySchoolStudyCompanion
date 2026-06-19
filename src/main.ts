@@ -434,6 +434,7 @@ function renderReferences(): void {
             ${category}
           </div>
           <p>${escapeHtml(reference.description ?? 'Open reference')}</p>
+          <div class="reference-open">Open link ↗</div>
         </a>
       `
     })

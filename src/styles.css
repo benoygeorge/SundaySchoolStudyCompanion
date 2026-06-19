@@ -487,13 +487,20 @@ a {
   border-radius: 18px;
   border: 1px solid rgba(15, 23, 42, 0.08);
   background: rgba(255, 255, 255, 0.74);
-  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease;
+  transition: transform 140ms ease, border-color 140ms ease, box-shadow 140ms ease, background-color 140ms ease;
+  cursor: pointer;
 }
 
 .reference-card:hover {
-  transform: translateY(-1px);
-  border-color: rgba(143, 91, 54, 0.24);
-  box-shadow: 0 12px 30px rgba(31, 41, 55, 0.08);
+  transform: translateY(-2px);
+  border-color: rgba(143, 91, 54, 0.34);
+  background: rgba(255, 255, 255, 0.96);
+  box-shadow: 0 14px 34px rgba(31, 41, 55, 0.1);
+}
+
+.reference-card:hover .reference-open {
+  color: var(--accent-strong);
+  text-decoration: underline;
 }
 
 .reference-card-top {
@@ -512,6 +519,13 @@ a {
   color: var(--accent-strong);
   font-size: 0.72rem;
   font-weight: 700;
+}
+
+.reference-open {
+  margin-top: 2px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: var(--muted);
 }
 
 .chapter-pill,
