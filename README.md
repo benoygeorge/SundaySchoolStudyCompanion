@@ -59,6 +59,43 @@ npm run build
 
 The built output is written to `dist/`, which is suitable for Azure Static Web Apps or any static host.
 
+## Deploy to Azure Static Web Apps
+
+This repo is currently deployed to Azure Static Web Apps in:
+
+- Resource group: `rg-sundayschool-studycompanion-central`
+- Region: `centralus`
+- Static Web App name: `sundayschool-studycompanion`
+
+Use the deploy helper for future changes (including HTML/JSON content updates):
+
+```bash
+npm run deploy:azure
+```
+
+What it does:
+
+1. Runs `npm run build`
+2. Deploys `dist/` to the configured Azure Static Web App production environment
+
+### Optional custom-domain automation
+
+The same script can also update Route 53 and request custom-domain binding:
+
+```bash
+DOMAIN=sunday.benoy.net \
+ROUTE53_ZONE_ID=Z03771873RZD17UBLU478 \
+UPDATE_DNS=true \
+ATTACH_CUSTOM_DOMAIN=true \
+npm run deploy:azure
+```
+
+Notes:
+
+- You must be logged into Azure CLI before deploying.
+- For Route 53 updates, you must also be authenticated to AWS CLI.
+- DNS propagation can take time; if domain attach validation is still pending, rerun the attach step later.
+
 ## Add another grade
 
 1. Create a new file in `public/data/grades/`.
