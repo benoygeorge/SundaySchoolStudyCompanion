@@ -1,0 +1,10 @@
+{
+  "grades": [
+    {
+      "id": "grade-10",
+      "label": "Grade 10",
+      "file": "/data/grades/grade-10.json",
+      "description": "Seeded with the study companion content from the provided Grade 10 source files."
+    }
+  ]
+}

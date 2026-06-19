@@ -1,0 +1,190 @@
+{
+  "grade": "Grade 10",
+  "title": "Interactive Study Companion",
+  "description": "Question bank and reference links live together in one grade file so the static app can load everything with one fetch.",
+  "chapters": [
+    {
+      "id": "Holy Qurbana",
+      "title": "Holy Qurbana",
+      "group": "Holy Church and Tradition"
+    }
+  ],
+  "questions": [
+    {
+      "id": "hq001",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "When did Jesus establish the Holy Qurbono as the New Testament sacrifice? What was replaced?",
+      "options": null,
+      "answer": "On the day of the Last Supper. Animal sacrifice of the Old Testament.",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq002",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "What does the Holy Qurbono commemorate?",
+      "options": null,
+      "answer": "Birth, public ministry, death, resurrection, and Second Coming of Jesus Christ.",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq003",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "What does the word 'Qurbono' mean?",
+      "options": null,
+      "answer": "Offering of sacrifice.",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq004",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "What is another name for Holy Qurbono/Holy Communion?",
+      "options": null,
+      "answer": "Queen of Sacraments.",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq005",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "Holy Qurbono is the '________'",
+      "options": null,
+      "answer": "Bread of life.",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq006",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "What are the 4 components of the Holy Qurbono?",
+      "options": null,
+      "answer": "The celebrant, The Sacramental items, Book of Holy Liturgy (Anaphora/Qurbono Taksa), and Recipient (congregation).",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq007",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "Who is the celebrant and who is the ambassador?",
+      "options": null,
+      "answer": "God is the celebrant, and the Prelate (Patriarch/Catholicose/bishop) or priest is the ambassador.",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq008",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "What are the primary Sacramental items for the holy Qurbono?",
+      "options": null,
+      "answer": "Leavened bread and wine mixed with water.",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq009",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "What are the official terms for the Book/Rite of the Holy Qurbono?",
+      "options": null,
+      "answer": "Anaphora or Qurbono Taksa.",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq010",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "How many different Taksas are there in existence?",
+      "options": null,
+      "answer": "> 80",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq011",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "The first church in Christianity is also known as _________. What occurred here?",
+      "options": null,
+      "answer": "Upper Room of St. Mark. The Last Supper occurred here.",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    },
+    {
+      "id": "hq012",
+      "chapter": "Holy Qurbana",
+      "section": "Study Guide - Shy Thomas, Norcross, GA",
+      "page": null,
+      "type": "short_answer",
+      "difficulty": "medium",
+      "question": "Who consecrates a church building? What is it anointed with?",
+      "options": null,
+      "answer": "A bishop. It is anointed with Holy Chrism (Mooron).",
+      "explanation": null,
+      "source_excerpt": "Shy Thomas, Norcross, GA"
+    }
+  ],
+  "references": [
+    {
+      "title": "Holy Qurbana: An Explanation",
+      "href": "https://malankaraworld.com/Library/Faith/Holy-Qurbana-an-explanation.htm",
+      "description": "Primary Grade 10 reference.",
+      "category": "Primary"
+    },
+    {
+      "title": "Kiss of Peace",
+      "href": "http://syriacorthodoxresources.org/Liturgy/Anaphora/KissOfPeace.html",
+      "description": "Anaphora reference for the liturgical sequence.",
+      "category": "Supplemental"
+    },
+    {
+      "title": "Preface",
+      "href": "http://syriacorthodoxresources.org/Liturgy/Anaphora/Preface.html",
+      "description": "Supplemental liturgy reference for Grade 10 study.",
+      "category": "Supplemental"
+    }
+  ]
+}
