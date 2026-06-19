@@ -119,7 +119,10 @@ app.innerHTML = `
         <section class="panel setup-panel">
           <div class="panel-heading">
             <h2>Study session setup</h2>
-            <span id="available-count-label" class="muted-chip">0 questions available</span>
+            <div class="panel-heading-actions">
+              <button type="button" id="start-session-top-btn" class="start-session-button start-session-button-compact">Start Study Session</button>
+              <span id="available-count-label" class="muted-chip">0 questions available</span>
+            </div>
           </div>
 
           <div class="setup-card setup-card-wide">
@@ -199,6 +202,7 @@ const quizSizeInput = document.querySelector<HTMLInputElement>('#quiz-size')!
 const availableCountLabel = document.querySelector<HTMLSpanElement>('#available-count-label')!
 const chaptersGrid = document.querySelector<HTMLDivElement>('#chapters-grid')!
 const startSessionButton = document.querySelector<HTMLButtonElement>('#start-session-btn')!
+const startSessionTopButton = document.querySelector<HTMLButtonElement>('#start-session-top-btn')!
 const selectAllChaptersButton = document.querySelector<HTMLButtonElement>('#select-all-chapters')!
 const clearAllChaptersButton = document.querySelector<HTMLButtonElement>('#clear-all-chapters')!
 
@@ -416,6 +420,13 @@ function repeatMissedQuestions(): void {
   renderQuestions()
 }
 
+function startSession(): void {
+  state.sessionStarted = true
+  buildSessionQuestions()
+  renderQuestions()
+  questionGrid.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+
 function renderReferences(): void {
   const references = state.activeGrade?.references ?? []
   referenceCount.textContent = `${references.length} link${references.length === 1 ? '' : 's'}`
@@ -618,10 +629,11 @@ clearAllChaptersButton.addEventListener('click', () => {
 })
 
 startSessionButton.addEventListener('click', () => {
-  state.sessionStarted = true
-  buildSessionQuestions()
-  renderQuestions()
-  questionGrid.scrollIntoView({ behavior: 'smooth', block: 'start' })
+  startSession()
+})
+
+startSessionTopButton.addEventListener('click', () => {
+  startSession()
 })
 
 repeatMissedButton.addEventListener('click', () => {
