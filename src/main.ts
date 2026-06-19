@@ -277,6 +277,7 @@ function questionMatchesSearch(question: StudyQuestion, query: string): boolean 
     question.chapter,
     question.section ?? '',
     question.question,
+    (question.options ?? []).join(' '),
     question.answer ?? '',
     question.explanation ?? '',
     question.source_excerpt ?? ''
@@ -546,6 +547,14 @@ function renderQuestions(): void {
     ? `<button type="button" class="card-action-button card-action-button-primary" data-action="reveal" data-question-id="${escapeHtml(question.id)}">Reveal Answer</button>`
     : ''
 
+  const optionBlock = question.options?.length
+    ? `
+      <ol class="option-list">
+        ${question.options.map((option) => `<li>${escapeHtml(option)}</li>`).join('')}
+      </ol>
+    `
+    : ''
+
   const selfAssessButtons = progress.revealed && question.answer
     ? `
       <div class="self-assess-row">
@@ -584,6 +593,7 @@ function renderQuestions(): void {
         ${question.page ? `<span>Page ${escapeHtml(String(question.page))}</span>` : ''}
         ${question.source_excerpt ? `<span>${escapeHtml(question.source_excerpt)}</span>` : ''}
       </div>
+      ${optionBlock}
       ${revealButton}
       ${answerBlock}
       ${selfAssessButtons}
