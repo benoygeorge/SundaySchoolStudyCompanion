@@ -336,7 +336,7 @@ function renderSetupPanel(): void {
   })
 
   const selectedPool = getSelectedQuestionPool()
-  availableCountLabel.textContent = `${selectedPool.length} questions available`
+  availableCountLabel.textContent = `${state.selectedChapters.length} chapters selected · ${selectedPool.length} questions available`
 
   const maxAllowed = Math.max(1, selectedPool.length)
   quizSizeInput.max = String(maxAllowed)
@@ -371,7 +371,7 @@ function renderGradeStats(): void {
   const grade = state.activeGrade
   questionCount.textContent = `${grade.questions.length}`
   chapterCount.textContent = `${getChapterChoices().length}`
-  answerCount.textContent = `${grade.questions.filter((question) => Boolean(question.answer)).length}`
+  answerCount.textContent = `${Object.values(state.questionProgress).filter((entry) => entry.selfGrade !== null).length}`
 }
 
 function buildSessionQuestions(): void {
@@ -397,6 +397,7 @@ function revealQuestion(questionId: string): void {
 function gradeQuestion(questionId: string, selfGrade: 'acceptable' | 'incorrect'): void {
   const current = getQuestionProgress(questionId)
   state.questionProgress[questionId] = { ...current, revealed: true, selfGrade }
+  answerCount.textContent = `${Object.values(state.questionProgress).filter((entry) => entry.selfGrade !== null).length}`
   renderQuestions()
 }
 
