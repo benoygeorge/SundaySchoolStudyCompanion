@@ -1,0 +1,4 @@
+interface:
+  display_name: "Study Companion API/Data"
+  short_description: "Change API contracts and Cosmos data."
+  default_prompt: "Use this skill when changing Study Companion Azure Functions, shared contracts, Cosmos containers, seeding, or data access behavior."

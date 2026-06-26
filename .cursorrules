@@ -1,0 +1,13 @@
+# Sunday School Study Companion Cursor Rules
+
+- Read `AGENTS.md` and `docs/context-map.md` before editing. Use root `ARCHITECTURE.md` for current technical details.
+- Stack: React + TypeScript + Vite in `src/`, TypeScript Azure Functions in `api/`, shared Zod contracts in `shared/`, Cosmos DB through `/api`, static fallback JSON in `public/data/`.
+- Frontend code calls `/api` only. Do not call the Exam API from browser code.
+- Do not commit or print real secrets, JWTs, deployment tokens, Cosmos keys, passwords, or app setting values.
+- Public/student payloads must not expose user IDs, names, emails, phone numbers, school IDs, private notes, raw pending patches, or audit records.
+- Before implementing a new UI feature, show the user an ASCII mock and wait for confirmation.
+- Update `ARCHITECTURE.md` when structure, routes, modules, env vars, deployment, infrastructure, or runtime flow changes.
+- Keep `public/data/` on the current shared contract; it is fallback/manual reference only.
+- Production mutations, deploys, DNS updates, and Cosmos seed/migrate/prune require explicit user confirmation immediately before execution.
+- Validation: `python3 scripts/check-ai-context.py`, `npm run typecheck`, `npm run build`, `npm run --prefix api build`, and `npm run --prefix api cosmos:inspect` as relevant.
+- There is currently no lint script or dedicated test runner; do not claim lint/tests ran unless added and executed.

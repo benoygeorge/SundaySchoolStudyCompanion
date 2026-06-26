@@ -1,0 +1,4 @@
+interface:
+  display_name: "Study Companion Azure Ops"
+  short_description: "Deploy and verify Azure resources."
+  default_prompt: "Use this skill when deploying, smoke testing, setting Azure app settings, or working with Study Companion Cosmos containers."

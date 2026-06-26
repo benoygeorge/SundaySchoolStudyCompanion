@@ -5,13 +5,29 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build",
+    "build": "npm run typecheck && vite build",
     "preview": "vite preview",
-    "typecheck": "tsc -b --pretty false",
+    "typecheck": "npm run typecheck:app && npm run typecheck:api",
+    "typecheck:app": "tsc -b --pretty false",
+    "typecheck:api": "tsc -p api/tsconfig.json --pretty false",
     "deploy:azure": "bash ./scripts/deploy-azure-static-webapp.sh"
   },
   "devDependencies": {
+    "@azure/functions": "^4.16.1",
+    "@rolldown/plugin-babel": "^0.2.3",
+    "@types/node": "^26.0.0",
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.2",
+    "babel-plugin-react-compiler": "^1.0.0",
     "typescript": "^5.8.3",
-    "vite": "^7.0.4"
+    "vite": "^8.0.16"
+  },
+  "dependencies": {
+    "@tanstack/react-query": "^5.101.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "react-router-dom": "^7.18.0",
+    "zod": "^4.4.3"
   }
 }

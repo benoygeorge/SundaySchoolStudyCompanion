@@ -39,6 +39,9 @@ fi
 echo "Building app..."
 npm run build
 
+echo "Building API..."
+npm run --prefix api build
+
 echo "Fetching deployment token..."
 DEPLOY_TOKEN="$(az staticwebapp secrets list --name "$SWA_NAME" --resource-group "$RG_NAME" --query properties.apiKey -o tsv)"
 if [[ -z "$DEPLOY_TOKEN" ]]; then
@@ -46,8 +49,8 @@ if [[ -z "$DEPLOY_TOKEN" ]]; then
   exit 1
 fi
 
-echo "Deploying dist/ to https://$SWA_HOST"
-npx --yes @azure/static-web-apps-cli deploy ./dist --deployment-token "$DEPLOY_TOKEN" --env "$SWA_ENV"
+echo "Deploying dist/ and api/ to https://$SWA_HOST"
+npx --yes @azure/static-web-apps-cli deploy ./dist --api-location ./api --api-language node --api-version 20 --deployment-token "$DEPLOY_TOKEN" --env "$SWA_ENV"
 
 if [[ "$UPDATE_DNS" == "true" ]]; then
   if ! command -v aws >/dev/null 2>&1; then

@@ -1,6 +1,60 @@
 {
   "grades": [
     {
+      "id": "grade-1",
+      "label": "Grade 1",
+      "file": "/data/grades/grade-1.json",
+      "description": "Curriculum shell ready for Admin-managed Grade 1 content."
+    },
+    {
+      "id": "grade-2",
+      "label": "Grade 2",
+      "file": "/data/grades/grade-2.json",
+      "description": "Curriculum shell ready for Admin-managed Grade 2 content."
+    },
+    {
+      "id": "grade-3",
+      "label": "Grade 3",
+      "file": "/data/grades/grade-3.json",
+      "description": "Curriculum shell ready for Admin-managed Grade 3 content."
+    },
+    {
+      "id": "grade-4",
+      "label": "Grade 4",
+      "file": "/data/grades/grade-4.json",
+      "description": "Curriculum shell ready for Admin-managed Grade 4 content."
+    },
+    {
+      "id": "grade-5",
+      "label": "Grade 5",
+      "file": "/data/grades/grade-5.json",
+      "description": "Curriculum shell ready for Admin-managed Grade 5 content."
+    },
+    {
+      "id": "grade-6",
+      "label": "Grade 6",
+      "file": "/data/grades/grade-6.json",
+      "description": "Curriculum shell ready for Admin-managed Grade 6 content."
+    },
+    {
+      "id": "grade-7",
+      "label": "Grade 7",
+      "file": "/data/grades/grade-7.json",
+      "description": "Curriculum shell ready for Admin-managed Grade 7 content."
+    },
+    {
+      "id": "grade-8",
+      "label": "Grade 8",
+      "file": "/data/grades/grade-8.json",
+      "description": "Curriculum shell ready for Admin-managed Grade 8 content."
+    },
+    {
+      "id": "grade-9",
+      "label": "Grade 9",
+      "file": "/data/grades/grade-9.json",
+      "description": "Curriculum shell ready for Admin-managed Grade 9 content."
+    },
+    {
       "id": "grade-10",
       "label": "Grade 10",
       "file": "/data/grades/grade-10.json",

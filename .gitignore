@@ -1,6 +1,12 @@
 dist
+api/dist
 node_modules
+api/node_modules
+.env
+.env.*
+!.env.example
 .DS_Store
 .vite
 *.log
 *.tsbuildinfo
+*-app.zip

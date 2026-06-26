@@ -1,0 +1,4 @@
+interface:
+  display_name: "Study Companion UI"
+  short_description: "Implement UI changes that follow this repo's design guide."
+  default_prompt: "Use this skill when changing Sunday School Study Companion screens, layout, styling, or interaction behavior."

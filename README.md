@@ -1,12 +1,25 @@
 # Sunday School Study Companion
 
-Static Vite app for loading grade-specific study questions and reference links from JSON files.
+React/Vite study companion with an Azure Static Web Apps managed API. The API reads grade-specific study content from Cosmos DB, while the checked-in JSON files remain the static compatibility fallback and manual content reference.
 
 ## What’s in the repo
 
-- `public/data/grade-index.json` is the manifest that tells the app which grade files exist.
-- `public/data/grades/grade-10.json` is the starter Grade 10 data file with questions and references together.
-- `src/main.ts` renders the study companion UI and loads the JSON data at runtime.
+- `AGENTS.md` and `docs/context-map.md` tell future coding agents what to read for each type of task.
+- `ARCHITECTURE.md` describes the current implemented system.
+- `public/data/grade-index.json` is the static fallback manifest that tells the app which grade files exist.
+- `public/data/grades/grade-1.json` through `grade-9.json` are empty current-schema curriculum shells.
+- `public/data/grades/grade-10.json` is the starter Grade 10 fallback data file with questions and references together.
+- `src/main.tsx` renders the React study companion UI.
+- `api/src/functions/` contains the Azure Functions handlers served under the Static Web Apps `/api` route.
+- `shared/studyContracts.ts` contains shared API contracts used by the frontend and API.
+
+## Content model
+
+- A grade owns books, optional book sections, chapters, questions, and references.
+- Every chapter belongs to a book; sections are optional.
+- Every question uses `chapterId` for placement and study-session filtering.
+- Citations are optional and can point to a book, chapter, reference, page range, and excerpt.
+- References use `resourceType`, `importance`, and `scope` instead of a free-text category.
 
 ## Get a file from this repo
 
@@ -39,6 +52,8 @@ If you want a specific file from the repository, use one of these approaches:
 
 3. Open the local URL shown by Vite in your browser.
 
+For local API development, copy `.env.example` to `.env` and provide the Cosmos, Exam API, and session settings. Keep real secrets in `.env`; it is ignored by git.
+
 ## Study session flow
 
 After the app loads a grade, use the setup panel to:
@@ -57,7 +72,7 @@ Run the production build with:
 npm run build
 ```
 
-The built output is written to `dist/`, which is suitable for Azure Static Web Apps or any static host.
+The frontend build output is written to `dist/`. The managed API is compiled under `api/dist/`.
 
 ## Deploy to Azure Static Web Apps
 
@@ -67,7 +82,7 @@ This repo is currently deployed to Azure Static Web Apps in:
 - Region: `centralus`
 - Static Web App name: `sundayschool-studycompanion`
 
-Use the deploy helper for future changes (including HTML/JSON content updates):
+Use the deploy helper for future changes:
 
 ```bash
 npm run deploy:azure
@@ -76,7 +91,20 @@ npm run deploy:azure
 What it does:
 
 1. Runs `npm run build`
-2. Deploys `dist/` to the configured Azure Static Web App production environment
+2. Builds the managed API with `npm run --prefix api build`
+3. Deploys `dist/` and `api/` to the configured Azure Static Web App production environment
+
+Required production app settings are stored on the Static Web App, not in source control:
+
+- `COSMOS_DATABASE_ID`
+- `COSMOS_ENDPOINT`
+- `COSMOS_KEY`
+- `STUDY_DISABLE_STATIC_FALLBACK`
+- `STUDY_SESSION_SECRET`
+- `EXAM_AUTH_BASE_URL`
+- `STUDY_COOKIE_SECURE`
+
+Dedicated Azure resources for this repo must stay in `rg-sundayschool-studycompanion-central`. The existing shared Cosmos DB account is intentionally outside this resource group; Study Companion data lives only in new `study-*` containers inside that shared account.
 
 ### Optional custom-domain automation
 
@@ -105,4 +133,4 @@ Notes:
 ## Static hosting notes
 
 - `staticwebapp.config.json` is included so route fallback works on Azure Static Web Apps.
-- This app does not require a backend. Everything is served as static assets.
+- The frontend stays static-hosting compatible. Dynamic auth and Cosmos-backed study reads are served by managed Static Web Apps API routes under `/api`.
